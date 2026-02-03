@@ -6,18 +6,24 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>我的宇宙 - Pure Light</title>
+    <!-- 引入图标库 -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         :root {
             --ios-blue: #007AFF;
             --ios-red: #FF3B30;
+            --ios-orange: #FF9500;
             --ios-green: #34C759;
-            --ios-gold: #FF9500;
+            --ios-gray: #8E8E93;
+            --ios-teal: #40C8E0; /* 新增：清爽的青色 */
             --bg-light: #F2F2F7;
             --glass: rgba(255, 255, 255, 0.75);
             --border: rgba(0, 0, 0, 0.05);
             --text-main: #1C1C1E;
             --text-sub: #8E8E93;
+            --ios-dark: #1C1C1E;
+            /* 吃饭时间颜色：莫兰迪檀色 */
+            --warm-time-accent: #AA7228; 
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
@@ -27,7 +33,8 @@
             font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
             background-color: var(--bg-light); color: var(--text-main);
             height: 100vh; overflow: hidden;
-            background-image: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=2073&auto=format&fit=crop');
+            /* 全局背景 */
+            background-image: url('https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?q=80&w=2000&auto=format&fit=crop');
             background-size: cover; background-position: center;
         }
 
@@ -44,124 +51,170 @@
             z-index: 100;
         }
         .main-nav { 
-            display: flex; background: rgba(0,0,0,0.06); 
+            display: flex; background: rgba(0,0,0,0.2); 
             padding: 3px; border-radius: 20px;
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
         }
         .nav-item { 
-            font-size: 13px; font-weight: 600; color: var(--text-sub); 
+            font-size: 13px; font-weight: 700; color: rgba(255,255,255,0.6); 
             padding: 6px 20px; cursor: pointer; border-radius: 17px; transition: 0.3s;
+            letter-spacing: 1px;
         }
         .nav-item.active { background: #FFF; color: #000; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
 
-        .page-container { flex: 1; overflow-y: auto; padding: 0 20px 140px; scrollbar-width: none; }
+        /* 内容容器 */
+        .page-container { 
+            flex: 1; 
+            overflow-y: auto; 
+            padding: 30px 20px 140px; 
+            scrollbar-width: none; 
+        }
         .page-container::-webkit-scrollbar { display: none; }
         .page { display: none; animation: fadeIn 0.4s ease; }
         .page.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* 工作页面座右铭 */
-        .work-motto {
-            text-align: center;
-            margin: 25px 0 15px;
-        }
-        .motto-cn { font-size: 16px; font-weight: 700; color: #000; margin-bottom: 4px; }
-        .motto-en { font-size: 10px; color: var(--text-sub); font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; line-height: 1.2; }
+        /* 卡片样式 */
+        .f-card { background: var(--glass); border-radius: 26px; border: 0.5px solid var(--border); overflow: hidden; margin-bottom: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
 
-        .period-selector { 
-            display: flex; gap: 4px; background: rgba(255,255,255,0.4); 
-            padding: 3px; border-radius: 12px; margin: 15px 0; border: 0.5px solid var(--border);
-        }
-        .period-btn { 
-            flex: 1; border: none; background: transparent; color: var(--text-sub); 
-            padding: 7px; font-size: 11px; font-weight: 700; border-radius: 9px;
-        }
-        .period-btn.active { background: #FFF; color: var(--ios-blue); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-
-        /* 统计卡片：缩减约 30% 尺寸 */
-        .work-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .stat-card { 
-            background: var(--glass); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            border-radius: 16px; border: 0.5px solid var(--border); padding: 8px 12px; 
-            display: flex; flex-direction: column; align-items: center; text-align: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.04);
-            transition: 0.2s;
-        }
-        .stat-card:active { transform: scale(0.97); }
-        .stat-icon { margin-bottom: 4px; opacity: 0.8; }
-        .stat-label { font-size: 10px; font-weight: 800; color: var(--text-sub); margin-bottom: 1px; }
-        .stat-value { font-size: 18px; font-weight: 800; color: #000; letter-spacing: -0.5px; } 
+        /* 工作页面组件 */
+        .work-motto { text-align: center; margin: 25px 0 15px; }
+        .motto-cn { font-size: 16px; font-weight: 700; color: #FFF; margin-bottom: 4px; text-shadow: 0 2px 10px rgba(0,0,0,0.3); }
+        .motto-en { font-size: 10px; color: rgba(255,255,255,0.7); font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; line-height: 1.2; }
         
-        .stat-ctrl { display: flex; align-items: center; gap: 10px; margin-top: 6px; }
-        .ctrl-btn { 
-            width: 24px; height: 24px; border-radius: 6px; border: none; 
-            background: rgba(0,0,0,0.05); color: #000; 
-            display: flex; align-items: center; justify-content: center; cursor: pointer;
+        .period-selector { display: flex; gap: 4px; background: rgba(255,255,255,0.15); padding: 3px; border-radius: 12px; margin: 15px 0; border: 0.5px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px); }
+        .period-btn { flex: 1; border: none; background: transparent; color: rgba(255,255,255,0.7); padding: 7px; font-size: 11px; font-weight: 700; border-radius: 9px; cursor: pointer; }
+        .period-btn.active { background: #FFF; color: #000; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .work-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .stat-card { background: var(--glass); border-radius: 24px; border: 0.5px solid var(--border); padding: 24px 12px; display: flex; flex-direction: column; align-items: center; text-align: center; transition: 0.2s; }
+        
+        .stat-icon-btn { 
+            width: 56px; height: 56px; border-radius: 16px; 
+            background: rgba(0,0,0,0.04); color: #1C1C1E; 
+            display: flex; align-items: center; justify-content: center; 
+            margin-bottom: 12px; cursor: pointer; transition: 0.2s;
         }
+        .stat-icon-btn:active { transform: scale(0.9); background: rgba(0,0,0,0.08); }
 
-        /* 2026 目标盒子 */
-        .goal-entry {
-            background: var(--glass); padding: 14px 20px; border-radius: 18px; border: 0.5px solid var(--border);
-            margin-top: 15px; display: flex; align-items: center; gap: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.04);
-            cursor: pointer;
-        }
-        .goal-icon { background: var(--ios-gold); width: 34px; height: 34px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #FFF; }
-        .goal-text h4 { margin: 0; font-size: 15px; font-weight: 800; }
-        .goal-text p { margin: 0; font-size: 11px; color: var(--text-sub); font-weight: 600; }
+        .stat-label { font-size: 10px; font-weight: 800; color: var(--text-sub); margin-bottom: 2px; }
+        .stat-value { font-size: 20px; font-weight: 800; color: var(--ios-gray); letter-spacing: -0.5px; } 
+        
+        .stat-ctrl { display: flex; align-items: center; gap: 10px; margin-top: 10px; min-height: 32px; }
+        .ctrl-btn { width: 32px; height: 32px; border-radius: 10px; border: none; background: #FFF; color: #000; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        
+        .submit-btn { background: var(--ios-dark); color: #FFF; width: 44px; height: 32px; border-radius: 10px; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; opacity: 0.9; }
+        .submit-btn:active { opacity: 0.7; transform: scale(0.95); }
 
-        /* 生活页面 */
+        .goal-entry { background: var(--glass); padding: 14px 20px; border-radius: 18px; border: 0.5px solid var(--border); margin-top: 15px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.04); cursor: pointer; }
+        .goal-text h4 { margin: 0; font-size: 16px; font-weight: 800; color: var(--ios-gray); text-align: center; letter-spacing: 2px; }
+
+        /* 生活页面样式优化 */
         .f-header { text-align: center; margin: 15px 0 20px; }
-        .f-weekday { font-size: 32px; font-weight: 800; }
-        .f-date { font-size: 13px; color: var(--text-sub); font-weight: 700; margin-top: 4px; }
-        .f-badge { display: inline-block; background: #EBF5FF; color: var(--ios-blue); font-size: 11px; font-weight: 800; padding: 4px 14px; border-radius: 100px; margin-top: 12px; }
-
+        .f-weekday { font-size: 32px; font-weight: 800; color: #FFF; text-shadow: 0 2px 10px rgba(0,0,0,0.3); }
+        .f-date { font-size: 13px; color: rgba(255,255,255,0.8); font-weight: 700; margin-top: 4px; }
+        .f-badge { display: inline-block; background: rgba(255,255,255,0.2); color: #FFF; font-size: 11px; font-weight: 800; padding: 4px 14px; border-radius: 100px; margin-top: 12px; backdrop-filter: blur(5px); }
+        
         .f-viewport { display: none; }
         .f-viewport.active { display: block; }
-
-        .f-card { background: var(--glass); border-radius: 26px; border: 0.5px solid var(--border); overflow: hidden; margin-bottom: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
-        .f-meal-row { padding: 18px 22px; border-bottom: 0.5px solid rgba(0,0,0,0.04); position: relative; }
-        .f-meal-row:last-child { border-bottom: none; }
-        .f-meal-tag { font-size: 10px; font-weight: 800; color: var(--text-sub); margin-bottom: 5px; display: block; opacity: 0.6; }
-        .f-meal-name { font-size: 18px; font-weight: 800; color: #000; }
-        .f-meal-desc { font-size: 13px; color: var(--text-sub); margin-top: 4px; line-height: 1.4; padding-right: 35px; }
-        .f-meal-swap { position: absolute; right: 20px; top: 38px; color: var(--ios-gold); cursor: pointer; opacity: 0.8; }
-
-        .f-procure-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        
+        .f-meal-row { 
+            padding: 14px 20px; 
+            border-bottom: 0.5px solid rgba(0,0,0,0.04); 
+            position: relative; 
+        }
+        
+        /* 1. 时间标签：暖金色 */
+        .f-meal-tag { 
+            font-size: 12px; 
+            font-weight: 800; 
+            color: var(--warm-time-accent); 
+            margin-bottom: 8px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 6px; 
+            opacity: 1; 
+            letter-spacing: 1px;
+        }
+        
+        .f-meal-name { font-size: 18px; font-weight: 800; color: #000; text-align: center; }
+        .f-meal-desc { font-size: 13px; color: var(--ios-gray); margin-top: 4px; line-height: 1.4; padding: 0 10px; text-align: center; }
+        
+        .f-meal-swap { 
+            position: absolute; 
+            right: 20px; 
+            top: 16px; 
+            color: var(--ios-blue); 
+            cursor: pointer; 
+            opacity: 0.8; 
+        }
+        
+        .f-meal-meta { margin-top: 10px; display: flex; flex-direction: row; justify-content: center; gap: 12px; border-top: 0.5px solid rgba(0,0,0,0.03); padding-top: 8px; }
+        
+        /* 饮品补剂颜色：全部统一为蓝色 */
+        .f-meta-item { font-size: 12px; color: var(--ios-blue); font-weight: 600; display: flex; align-items: center; gap: 6px; }
+        .f-meta-item.blue { color: var(--ios-blue); }
+        
+        .f-procure-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
         .f-procure-box { background: rgba(255,255,255,0.4); padding: 12px 15px; border-radius: 18px; border: 0.5px solid var(--border); }
+        .f-procure-box.full { grid-column: span 2; }
         .f-procure-title { font-size: 10px; font-weight: 800; color: var(--text-sub); margin-bottom: 8px; display: flex; align-items: center; gap: 5px; }
         .f-ing-tag { font-size: 10px; color: #000; background: #FFF; padding: 3px 8px; border-radius: 6px; margin: 2px; display: inline-block; font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
-
-        .f-dock { 
-            position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); 
-            background: rgba(255,255,255,0.8); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            padding: 6px; border-radius: 100px; display: flex; gap: 5px; 
-            border: 0.5px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            z-index: 100;
-        }
+        .f-sync-btn { width: 100%; background: #000; color: #FFF; border: none; padding: 14px; border-radius: 14px; font-size: 14px; font-weight: 700; margin-top: 20px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        
+        .f-dock { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); background: rgba(255,255,255,0.8); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); padding: 6px; border-radius: 100px; display: flex; gap: 5px; border: 0.5px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.1); z-index: 100; }
         .f-dock-btn { padding: 10px 22px; border-radius: 100px; font-size: 12px; font-weight: 700; color: var(--text-sub); display: flex; align-items: center; gap: 8px; transition: 0.2s; cursor: pointer; }
         .f-dock-btn.active { background: #FFF; color: #000; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .f-plan-tabs { display: flex; background: rgba(0,0,0,0.04); padding: 4px; border-radius: 18px; margin-bottom: 15px; gap: 4px; }
+        .f-plan-tab { flex: 1; text-align: center; padding: 10px; border-radius: 14px; font-size: 12px; font-weight: 700; color: var(--text-sub); cursor: pointer; transition: 0.2s; }
+        .f-plan-tab.active { background: #FFF; color: #000; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
 
-        /* 未来页面并排布局 */
-        .future-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px; }
-        .future-card { 
-            background: var(--glass); padding: 20px; border-radius: 24px; border: 0.5px solid var(--border);
-            display: flex; flex-direction: column; align-items: flex-start; cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.04); transition: 0.2s;
-        }
-        .future-card:active { transform: scale(0.96); }
-        .future-icon { width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 15px; color: #FFF; }
-        .future-title { font-size: 16px; font-weight: 800; margin-bottom: 4px; }
-        .future-sub { font-size: 11px; color: var(--text-sub); font-weight: 600; line-height: 1.4; }
-
-        /* 子页面覆盖层 */
-        .sub-layer {
-            position: fixed; inset: 0; background: #FFF; z-index: 1000;
-            transform: translateY(100%); transition: 0.4s cubic-bezier(0.1, 0.9, 0.2, 1);
-            background-image: linear-gradient(to bottom, #FFF, #F2F2F7);
-        }
+        /* 子页面弹出层系统 */
+        .sub-layer { position: fixed; inset: 0; background: #FFF; z-index: 1000; transform: translateY(100%); transition: 0.4s cubic-bezier(0.1, 0.9, 0.2, 1); overflow: hidden; }
         .sub-layer.active { transform: translateY(0); }
-        .sub-head { padding: 60px 24px 20px; display: flex; align-items: center; justify-content: space-between; }
-        .close-btn { color: var(--ios-blue); font-weight: 700; font-size: 16px; cursor: pointer; }
+        .sub-head { padding: 60px 24px 20px; display: flex; flex-direction: column; align-items: center; position: relative; z-index: 10; }
+        .sub-layer h2 { text-align: center; color: #FFF; font-weight: 800; font-size: 20px; margin: 0; letter-spacing: 3px; text-shadow: 0 2px 10px rgba(0,0,0,0.3); }
+        .sub-layer .close-btn { color: #FFF; position: absolute; right: 24px; top: 62px; font-weight: 700; cursor: pointer; text-shadow: 0 1px 5px rgba(0,0,0,0.3); }
 
+        /* 详情页背景 */
+        .sub-layer.vision-future { 
+            background-image: linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.2)), url('https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=2070&auto=format&fit=crop'); 
+            background-size: cover; background-position: center; 
+        }
+        .sub-layer.health-center { 
+            background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=2070&auto=format&fit=crop'); 
+            background-size: cover; background-position: center; 
+        }
+        .sub-layer-2026 { 
+            background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=2000&auto=format&fit=crop'); 
+            background-size: cover; background-position: center; 
+        }
+
+        .health-grid { display: flex; flex-direction: column; align-items: center; gap: 30px; padding: 20px 30px; }
+        .fitness-check { display: flex; justify-content: space-between; width: 100%; padding: 10px 0; max-width: 320px; }
+        .check-day { font-size: 24px; font-weight: 800; color: rgba(255,255,255,0.3); transition: 0.3s; cursor: pointer; }
+        .check-day.active { color: #FFF; text-shadow: 0 0 15px rgba(255,255,255,0.8); }
+
+        .quick-check-btn { background: rgba(255,255,255,0.2); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.3); color: #FFF; padding: 12px 28px; border-radius: 100px; font-size: 14px; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; transition: 0.2s; }
+        .quick-check-btn.checked-warm { background: rgba(255, 149, 0, 0.6); }
+        
+        .exam-row { display: flex; flex-direction: column; align-items: center; gap: 4px; margin-top: 10px; }
+        
+        .memo-container { padding: 20px; height: calc(100% - 120px); overflow-y: auto; }
+        .memo-input-box { display: flex; gap: 10px; margin-bottom: 24px; }
+        .memo-input { flex: 1; border: none; background: rgba(255,255,255,0.2); padding: 14px 18px; border-radius: 16px; backdrop-filter: blur(10px); font-size: 15px; font-weight: 600; color: #FFF; border: 0.5px solid rgba(255,255,255,0.2); }
+        .memo-add-btn { background: #FFF; color: #000; border: none; padding: 0 24px; border-radius: 16px; font-weight: 700; font-size: 14px; cursor: pointer; }
+        .memo-item { padding: 18px; background: rgba(255,255,255,0.15); backdrop-filter: blur(20px); border-radius: 20px; border: 0.5px solid rgba(255,255,255,0.1); margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; }
+        .memo-item-text { font-size: 15px; font-weight: 600; color: #FFF; flex: 1; }
+        .memo-del-btn { color: #FFF; padding: 5px; opacity: 0.4; cursor: pointer; }
+
+        .history-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); z-index: 2000; display: none; align-items: center; justify-content: center; padding: 20px; }
+        .history-overlay.active { display: flex; }
+        .history-card { background: #FFF; width: 100%; max-width: 320px; border-radius: 28px; padding: 24px; max-height: 70vh; display: flex; flex-direction: column; }
+        .history-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .history-list { flex: 1; overflow-y: auto; }
+        .history-item { padding: 12px 0; border-bottom: 0.5px solid #EEE; display: flex; justify-content: space-between; font-weight: 600; }
+        .history-item span:first-child { color: var(--ios-gray); }
     </style>
 </head>
 <body>
@@ -169,56 +222,45 @@
 <div id="app-frame">
     <header class="main-header">
         <nav class="main-nav">
-            <div class="nav-item active" onclick="switchNav('work', this)">工作</div>
-            <div class="nav-item" onclick="switchNav('life', this)">生活</div>
-            <div class="nav-item" onclick="switchNav('future', this)">未来</div>
+            <div class="nav-item active" onclick="switchNav('work', this)">WORK</div>
+            <div class="nav-item" onclick="switchNav('life', this)">LIFE</div>
+            <div class="nav-item" onclick="switchNav('future', this)">FUTURE</div>
         </nav>
     </header>
 
     <div class="page-container">
-        
         <!-- === 工作页面 === -->
         <div id="page-work" class="page active">
             <div class="work-motto">
                 <div class="motto-cn">一旦觉得自己聪明 我将开始变得愚蠢</div>
-                <div class="motto-en">Once I think I am smart, I will start to become foolish.</div>
+                <div class="motto-en">Once I think I am smart I will start to become foolish</div>
             </div>
-
             <div class="period-selector">
-                <button class="period-btn active" onclick="setPeriod('week', this)">每周</button>
+                <button class="period-btn active" id="btn-week" onclick="setPeriod('week', this)">每周</button>
                 <button class="period-btn" onclick="setPeriod('month', this)">每月</button>
                 <button class="period-btn" onclick="setPeriod('quarter', this)">季度</button>
                 <button class="period-btn" onclick="setPeriod('year', this)">年度</button>
             </div>
-
             <div class="work-grid">
                 <div class="stat-card">
-                    <i data-lucide="video" class="stat-icon" style="color:var(--ios-red)" width="16"></i>
+                    <div class="stat-icon-btn" onclick="openHistory('v')">
+                        <i data-lucide="tv" width="28"></i>
+                    </div>
                     <div class="stat-label">媒体</div>
                     <div class="stat-value" id="val-v">0</div>
-                    <div class="stat-ctrl">
-                        <button class="ctrl-btn" onclick="updateVal('v', -1)"><i data-lucide="minus" width="12"></i></button>
-                        <button class="ctrl-btn" onclick="updateVal('v', 1)"><i data-lucide="plus" width="12"></i></button>
-                    </div>
+                    <div class="stat-ctrl" id="ctrl-v"></div>
                 </div>
                 <div class="stat-card">
-                    <i data-lucide="music" class="stat-icon" style="color:var(--ios-blue)" width="16"></i>
+                    <div class="stat-icon-btn" onclick="openHistory('m')">
+                        <i data-lucide="disc" width="28"></i>
+                    </div>
                     <div class="stat-label">音乐</div>
                     <div class="stat-value" id="val-m">0</div>
-                    <div class="stat-ctrl">
-                        <button class="ctrl-btn" onclick="updateVal('m', -1)"><i data-lucide="minus" width="12"></i></button>
-                        <button class="ctrl-btn" onclick="updateVal('m', 1)"><i data-lucide="plus" width="12"></i></button>
-                    </div>
+                    <div class="stat-ctrl" id="ctrl-m"></div>
                 </div>
             </div>
-
-            <div class="goal-entry" onclick="openSub('vision')">
-                <div class="goal-icon"><i data-lucide="flag" width="18"></i></div>
-                <div class="goal-text">
-                    <h4>2026 目标记录</h4>
-                    <p>点击进入管理年度核心计划</p>
-                </div>
-                <i data-lucide="chevron-right" width="16" style="color:var(--text-sub); margin-left:auto;"></i>
+            <div class="goal-entry" onclick="openSub('2026')">
+                <div class="goal-text"><h4>2026</h4></div>
             </div>
         </div>
 
@@ -229,85 +271,204 @@
                 <div class="f-date" id="f-date">...</div>
                 <div class="f-badge" id="f-cycle-text">食谱推荐 1 / 14</div>
             </div>
-
             <div id="f-view-today" class="f-viewport active">
                 <div class="f-card">
                     <div class="f-meal-row">
-                        <span class="f-meal-tag">08:00 Breakfast</span>
+                        <span class="f-meal-tag"><i data-lucide="sunrise" width="14"></i> 08:00</span>
                         <div class="f-meal-name" id="f-m-name">...</div>
                         <div class="f-meal-desc" id="f-m-desc">...</div>
+                        <div class="f-meal-meta">
+                            <div class="f-meta-item"><i data-lucide="coffee" width="12"></i> <span id="f-m-drink">...</span></div>
+                            <div class="f-meta-item blue"><i data-lucide="zap" width="12"></i> <span id="f-m-supps">...</span></div>
+                        </div>
                         <div class="f-meal-swap" onclick="f_swap()"><i data-lucide="refresh-cw" width="16"></i></div>
                     </div>
                     <div class="f-meal-row">
-                        <span class="f-meal-tag">12:00 Lunch</span>
+                        <span class="f-meal-tag"><i data-lucide="sun" width="14"></i> 12:00</span>
                         <div class="f-meal-name" id="f-l-name">...</div>
                         <div class="f-meal-desc" id="f-l-desc">...</div>
+                        <div class="f-meal-meta">
+                            <div class="f-meta-item"><i data-lucide="glass-water" width="12"></i> <span id="f-l-drink">...</span></div>
+                            <div class="f-meta-item blue"><i data-lucide="zap" width="12"></i> <span id="f-l-supps">...</span></div>
+                        </div>
                     </div>
                     <div class="f-meal-row">
-                        <span class="f-meal-tag">18:00 Dinner</span>
+                        <span class="f-meal-tag"><i data-lucide="moon" width="14"></i> 18:00</span>
                         <div class="f-meal-name" id="f-n-name">...</div>
                         <div class="f-meal-desc" id="f-n-desc">...</div>
+                        <div class="f-meal-meta">
+                            <div class="f-meta-item"><i data-lucide="glass-water" width="12"></i> <span id="f-n-drink">...</span></div>
+                        </div>
                     </div>
                 </div>
-                <div class="f-procure-grid">
-                    <div class="f-procure-box"><div class="f-procure-title"><i data-lucide="beef" width="12"></i> 蛋白质</div><div id="f-list-meat"></div></div>
-                    <div class="f-procure-box"><div class="f-procure-title"><i data-lucide="waves" width="12"></i> 海鲜类</div><div id="f-list-seafood"></div></div>
-                </div>
             </div>
-
             <div id="f-view-plan" class="f-viewport">
                 <div class="f-plan-tabs" id="f-plan-tabs"></div>
                 <div class="f-card" style="padding:22px;">
-                    <div id="f-plan-day-title" style="font-weight:800; font-size:18px; margin-bottom:15px; color:var(--ios-blue);">计划详情</div>
+                    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:15px;"><div id="f-plan-day-title" style="font-weight:800; font-size:18px; color:var(--ios-blue);">计划详情</div><div style="color:var(--ios-gray);" onclick="f_step_next()"><i data-lucide="rotate-ccw" width="16"></i></div></div>
                     <div id="f-plan-content" style="display:flex; flex-direction:column; gap:16px;"></div>
                 </div>
+                <div class="f-procure-grid">
+                    <div class="f-procure-box"><div class="f-procure-title" style="color:var(--ios-red)"><i data-lucide="beef" width="12"></i> 蛋白质</div><div id="f-list-meat"></div></div>
+                    <div class="f-procure-box"><div class="f-procure-title" style="color:var(--ios-blue)"><i data-lucide="waves" width="12"></i> 海鲜类</div><div id="f-list-seafood"></div></div>
+                    <div class="f-procure-box full"><div class="f-procure-title" style="color:var(--ios-green)"><i data-lucide="leafy-green" width="12"></i> 蔬果 / 碳水</div><div id="f-list-veg"></div></div>
+                </div>
+                <button class="f-sync-btn" onclick="f_sync()">更新当前食谱 <i data-lucide="chevron-right" width="16"></i></button>
             </div>
-
             <div class="f-dock">
                 <div class="f-dock-btn active" id="btn-f-today" onclick="switchLife('today', this)"><i data-lucide="layout" width="16"></i> 今日</div>
-                <div class="f-dock-btn" id="btn-f-plan" onclick="switchLife('plan', this)"><i data-lucide="calendar" width="16"></i> 计划</div>
+                <div class="f-dock-btn" id="btn-f-plan" onclick="switchLife('plan', this)"><i data-lucide="calendar" width="16"></i> 食谱</div>
             </div>
         </div>
 
-        <!-- === 未来页面 === -->
+        <!-- === 未来页面 (Apple Art Style Update) === -->
         <div id="page-future" class="page">
-            <div style="font-size: 20px; font-weight: 800; margin: 20px 0 15px;">2026 愿景</div>
-            <div class="future-grid">
-                <div class="future-card" onclick="openSub('vision')">
-                    <div class="future-icon" style="background:var(--ios-blue)"><i data-lucide="target" width="20"></i></div>
-                    <div class="future-title">愿景目标</div>
-                    <div class="future-sub">核心计划与<br>梦想蓝图</div>
+            <div style="display: flex; flex-direction: column; gap: 40px; padding-top: 10px;">
+                <!-- 3. 愿景目标: Apple Compass Style -->
+                <div class="f-card" style="min-height: 220px; padding: 30px; display: flex; flex-direction: column; justify-content: center; align-items: center; background: linear-gradient(135deg, rgba(255,255,255,0.4), rgba(0,122,255,0.05)); cursor: pointer;" onclick="openSub('vision-future')">
+                    <!-- Icon Container: Transparent + Colored Icon -->
+                    <div style="background: rgba(0,122,255,0.15); width: 88px; height: 88px; border-radius: 26px; display: flex; align-items: center; justify-content: center; color: var(--ios-blue); margin-bottom: 18px; backdrop-filter: blur(10px);">
+                        <i data-lucide="compass" width="48" stroke-width="1.5"></i>
+                    </div>
+                    <h3 style="margin: 0; font-size: 22px; font-weight: 800; color: #000; letter-spacing: 2px;">愿景目标</h3>
                 </div>
-                <div class="future-card" onclick="openSub('health')">
-                    <div class="future-icon" style="background:var(--ios-red)"><i data-lucide="heart-pulse" width="20"></i></div>
-                    <div class="future-title">健康管理</div>
-                    <div class="future-sub">体能监控与<br>状态记录</div>
+                
+                <!-- 3. 身心修养: Apple Health/Mindfulness Style (Teal) -->
+                <div class="f-card" style="min-height: 220px; padding: 30px; display: flex; flex-direction: column; justify-content: center; align-items: center; background: linear-gradient(135deg, rgba(255,255,255,0.4), rgba(64,200,224,0.05)); cursor: pointer;" onclick="openSub('health')">
+                    <!-- Icon Container: Transparent + Colored Icon -->
+                    <div style="background: rgba(64,200,224,0.15); width: 88px; height: 88px; border-radius: 26px; display: flex; align-items: center; justify-content: center; color: var(--ios-teal); margin-bottom: 18px; backdrop-filter: blur(10px);">
+                        <i data-lucide="activity" width="48" stroke-width="1.5"></i>
+                    </div>
+                    <h3 style="margin: 0; font-size: 22px; font-weight: 800; color: #000; letter-spacing: 2px;">身心修养</h3>
                 </div>
             </div>
         </div>
-
     </div>
 </div>
 
-<!-- 子页面弹出层 -->
-<div id="sub-layer" class="sub-layer">
+<!-- 弹层部分 -->
+<div id="sub-layer-2026" class="sub-layer sub-layer-2026">
     <div class="sub-head">
-        <h2 id="sub-title" style="margin:0; font-size:22px; font-weight:800;">标题</h2>
-        <div class="close-btn" onclick="closeSub()">完成</div>
+        <h2 style="margin:0; font-size:19px; font-weight:800; color:#FFF;">2026目标</h2>
+        <div class="close-btn" onclick="closeAllSubs()" style="color:#FFF;">完成</div>
     </div>
-    <div style="padding:0 24px 100px;" id="sub-body"></div>
+    <div class="memo-container">
+        <div class="memo-input-box">
+            <input type="text" id="memo-input-2026" class="memo-input" style="background:rgba(255,255,255,0.2); color:#FFF;" placeholder="记录你的愿景...">
+            <button class="memo-add-btn" style="background:#FFF; color:#000;" onclick="addItem('2026')">记录</button>
+        </div>
+        <div id="memo-list-2026" class="memo-list"></div>
+    </div>
+</div>
+
+<div id="sub-layer-vision-future" class="sub-layer vision-future">
+    <div class="sub-head">
+        <h2>愿景目标</h2>
+        <div style="font-size: 10px; color: rgba(255,255,255,0.8); font-weight: 700; margin-top: 5px; letter-spacing: 5px; text-shadow: 0 1px 3px rgba(0,0,0,0.4);">心外无物 为家为梦</div>
+        <div class="close-btn" onclick="closeAllSubs()">返回</div>
+    </div>
+    <div class="memo-container">
+        <div class="memo-input-box">
+            <input type="text" id="memo-input-future" class="memo-input" placeholder="">
+            <button class="memo-add-btn" onclick="addItem('future')">记录</button>
+        </div>
+        <div id="memo-list-future" class="memo-list"></div>
+    </div>
+</div>
+
+<div id="sub-layer-health" class="sub-layer health-center">
+    <div class="sub-head">
+        <h2>身心修养</h2>
+        <div style="font-size: 10px; color: rgba(255,255,255,0.8); font-weight: 700; margin-top: 5px; letter-spacing: 4px; text-shadow: 0 1px 3px rgba(0,0,0,0.3);">着急的都不重要 重要的都不着急</div>
+        <div class="close-btn" onclick="closeAllSubs()">完成</div>
+    </div>
+    <div class="health-grid">
+        <div class="fitness-check" id="fitness-check"></div>
+        <div id="btn-fitness-main" class="quick-check-btn" onclick="autoCheckToday()">
+            <i data-lucide="check-circle" width="16"></i> <span id="txt-fitness-btn">健身打卡</span>
+        </div>
+        <div class="exam-row">
+            <div style="color:rgba(255,255,255,0.8); font-size:12px; font-weight:600; letter-spacing: 0.5px;">体检更新时间</div>
+            <div class="exam-date" id="exam-date-display" style="color:#FFF; font-weight:700;">...</div>
+        </div>
+        <div id="btn-exam-main" class="quick-check-btn" onclick="autoUpdateExam(event)">
+            <i data-lucide="clipboard-check" width="16"></i> <span id="txt-exam-btn">记录</span>
+        </div>
+    </div>
+</div>
+
+<div id="history-overlay" class="history-overlay">
+    <div class="history-card">
+        <div class="history-header">
+            <h3 id="history-title" style="margin:0; font-size:18px;">历史记录</h3>
+            <div onclick="closeHistory()" style="cursor:pointer; color:var(--ios-gray);"><i data-lucide="x" width="20"></i></div>
+        </div>
+        <div id="history-list" class="history-list"></div>
+    </div>
 </div>
 
 <script>
-    // --- 工作逻辑: 绝对联动 (数据初始为 0) ---
-    let weeklyUnits = { v: 0, m: 0 }; 
-    let activePeriod = 'week';
-    const periodRates = { week: 1, month: 4.3, quarter: 13, year: 52 };
+    // --- 数据存储系统 ---
+    let counters = JSON.parse(localStorage.getItem('my_universe_counters_v3')) || {
+        week: { v: 0, m: 0 },
+        month: { v: 0, m: 0 },
+        quarter: { v: 0, m: 0 },
+        year: { v: 0, m: 0 }
+    };
+    
+    let mediaHistory = JSON.parse(localStorage.getItem('my_universe_media_history_v2')) || [];
+    let musicHistory = JSON.parse(localStorage.getItem('my_universe_music_history_v2')) || [];
+    
+    let saved2026 = JSON.parse(localStorage.getItem('pure_light_memo_v2')) || ["保持对世界的好奇心"];
+    let savedFuture = JSON.parse(localStorage.getItem('pure_light_future_vision')) || ["实现财务与时间的自由"];
+    let savedFitness = JSON.parse(localStorage.getItem('pure_light_fitness')) || [0,0,0,0,0,0,0];
+    let savedExam = localStorage.getItem('pure_light_exam_date') || "2025.12.01";
+    let lastWeekNum = localStorage.getItem('my_universe_last_week') || 0;
 
+    let activePeriod = 'week';
+
+    // --- 工作逻辑 ---
     function updateVal(type, delta) {
-        weeklyUnits[type] = Math.max(0, weeklyUnits[type] + delta);
-        renderWork();
-        if(navigator.vibrate) navigator.vibrate(10);
+        if(activePeriod !== 'week') return;
+        ['week', 'month', 'quarter', 'year'].forEach(p => {
+            counters[p][type] = Math.max(0, counters[p][type] + delta);
+        });
+        saveCounters(); renderWork();
+    }
+
+    function submitPeriod(type) {
+        const valToSubmit = counters[activePeriod][type];
+        if(valToSubmit <= 0) return;
+        const now = new Date();
+        let label = "";
+        if(activePeriod === 'month') label = `${now.getFullYear()}年${now.getMonth()+1}月结算`;
+        else if(activePeriod === 'quarter') label = `${now.getFullYear()}年Q${Math.floor(now.getMonth()/3)+1}结算`;
+        else if(activePeriod === 'year') label = `${now.getFullYear()}年度总结`;
+        else label = `第${lastWeekNum}周存档`;
+
+        const log = { label, value: valToSubmit, periodType: activePeriod, date: now.getTime() };
+        if(type === 'v') mediaHistory.unshift(log);
+        else musicHistory.unshift(log);
+        localStorage.setItem(`my_universe_${type==='v'?'media':'music'}_history_v2`, JSON.stringify(type==='v'?mediaHistory:musicHistory));
+        counters[activePeriod][type] = 0;
+        saveCounters(); renderWork();
+    }
+
+    function saveCounters() { localStorage.setItem('my_universe_counters_v3', JSON.stringify(counters)); }
+
+    function renderWork() {
+        document.getElementById('val-v').innerText = counters[activePeriod].v;
+        document.getElementById('val-m').innerText = counters[activePeriod].m;
+        const renderControls = (type) => {
+            const container = document.getElementById(`ctrl-${type}`);
+            if(activePeriod === 'week') {
+                container.innerHTML = `<button class="ctrl-btn" onclick="updateVal('${type}', -1)"><i data-lucide="minus" width="16"></i></button><button class="ctrl-btn" onclick="updateVal('${type}', 1)"><i data-lucide="plus" width="16"></i></button>`;
+            } else {
+                container.innerHTML = `<button class="submit-btn" onclick="submitPeriod('${type}')"><i data-lucide="upload" width="16"></i></button>`;
+            }
+        };
+        renderControls('v'); renderControls('m');
+        lucide.createIcons();
     }
 
     function setPeriod(p, el) {
@@ -317,139 +478,176 @@
         renderWork();
     }
 
-    function renderWork() {
-        const rate = periodRates[activePeriod];
-        document.getElementById('val-v').innerText = Math.round(weeklyUnits.v * rate);
-        document.getElementById('val-m').innerText = Math.round(weeklyUnits.m * rate);
+    // --- 导航与弹层逻辑 ---
+    function switchNav(p, el) {
+        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+        el.classList.add('active');
+        document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+        const target = document.getElementById('page-'+p); if(target) target.classList.add('active');
+        if(p === 'life') f_init();
+        const d = new Date(); const weekdays = ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"];
+        if(document.getElementById('f-weekday')) document.getElementById('f-weekday').innerText = weekdays[d.getDay()];
+        if(document.getElementById('f-date')) document.getElementById('f-date').innerText = d.toLocaleDateString('zh-CN').replace(/\//g, '.');
+        lucide.createIcons();
     }
 
-    // --- 食谱数据 (维持辛苦做好的 14 天循环接口) ---
-    const DB = [
-        { d: 1, label: "DAY 1", m: { n: "牛腱燕麦面", i: ["卤牛腱80g", "鸡蛋1个", "菠菜120g"], d: "美式" }, l: { n: "黑椒牛里脊意面", i: ["牛里脊180g", "西兰花150g"], d: "苏打水" }, n: { n: "牛里脊(无碳)", i: ["牛里脊120g", "彩椒80g"], d: "温水" } },
-        { d: 2, label: "DAY 2", m: { n: "奶酪煎蛋吐司", i: ["煎蛋2个", "低脂奶酪30g", "番茄120g"], d: "奶茶咖啡" }, l: { n: "蒜香虾仁荞麦面", i: ["虾仁200g", "西葫芦120g", "蘑菇150g"], d: "果汁" }, n: { n: "蒜香虾仁(无碳)", i: ["虾仁130g", "蘑菇120g"], d: "温水" } },
-        { d: 3, label: "DAY 3", m: { n: "希腊酸奶燕麦碗", i: ["酸奶150g", "蓝莓60g", "坚果碎15g"], d: "美式" }, l: { n: "照烧鸡腿糙米饭", i: ["去皮鸡腿180g", "西兰花150g"], d: "果汁" }, n: { n: "照烧鸡腿(无碳)", i: ["去皮鸡腿120g", "胡萝卜80g"], d: "温水" } },
-        { d: 4, label: "DAY 4", m: { n: "红薯豆腐鸡蛋餐", i: ["鸡蛋2个", "嫩豆腐100g"], d: "抗炎水" }, l: { n: "咖喱牛腩米饭", i: ["牛腩200g", "土豆80g", "西兰花150g"], d: "果汁" }, n: { n: "咖喱牛腩(无碳)", i: ["牛腩130g", "洋葱50g"], d: "温水" } },
-        { d: 5, label: "DAY 5", m: { n: "三文鱼蛋吐司", i: ["煎蛋1个", "三文鱼80g"], d: "抗炎水" }, l: { n: "蒜香鸡腿玉米粒", i: ["去皮鸡腿200g", "芦笋150g"], d: "果汁" }, n: { n: "蒜香鸡腿(无碳)", i: ["去皮鸡腿130g", "蘑菇100g"], d: "电解质水" } }
-    ];
-
-    let currentRecipeIdx = 0;
-    const weekdays = ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"];
-
-    function f_init() {
-        const d = new Date();
-        document.getElementById('f-weekday').innerText = weekdays[d.getDay()];
-        document.getElementById('f-date').innerText = d.toLocaleDateString('zh-CN', {year:'numeric', month:'2-digit', day:'2-digit'}).replace(/\//g,'.');
-        const start = new Date(2025, 0, 6);
-        const diff = Math.floor((d - start) / 86400000);
-        currentRecipeIdx = (diff % DB.length + DB.length) % DB.length;
-        f_render();
-    }
-
-    function f_render() {
-        const item = DB[currentRecipeIdx];
-        document.getElementById('f-cycle-text').innerText = `食谱推荐 ${item.d} / 14`;
-        document.getElementById('f-m-name').innerText = item.m.n;
-        document.getElementById('f-m-desc').innerText = item.m.i.join(' · ');
-        document.getElementById('f-l-name').innerText = item.l.n;
-        document.getElementById('f-l-desc').innerText = item.l.i.join(' · ');
-        document.getElementById('f-n-name').innerText = item.n.n;
-        document.getElementById('f-n-desc').innerText = item.n.i.join(' · ');
-        
-        const allIngs = [...item.m.i, ...item.l.i, ...item.n.i];
-        const filterIngs = (reg) => Array.from(new Set(allIngs.filter(i => reg.test(i))));
-        document.getElementById('f-list-meat').innerHTML = filterIngs(/牛|鸡|蛋/).map(i => `<span class="f-ing-tag">${i}</span>`).join('');
-        document.getElementById('f-list-seafood').innerHTML = filterIngs(/鱼|虾/).map(i => `<span class="f-ing-tag">${i}</span>`).join('');
-    }
-
-    function f_swap() { currentRecipeIdx = (currentRecipeIdx + 1) % DB.length; f_render(); }
-
+    // 修复 switchLife 未定义错误
     function switchLife(type, el) {
         document.querySelectorAll('.f-dock-btn').forEach(b => b.classList.remove('active'));
         el.classList.add('active');
         document.querySelectorAll('.f-viewport').forEach(v => v.classList.remove('active'));
         const target = document.getElementById('f-view-' + type);
         if(target) target.classList.add('active');
-        if(type === 'plan') renderPlanList();
+        if(type === 'plan') f_render_plan();
     }
 
-    function renderPlanList() {
-        const tabs = document.getElementById('f-plan-tabs');
-        tabs.innerHTML = DB.map((day, i) => `
-            <div class="f-plan-tab ${i === 0 ? 'active' : ''}" onclick="showPlanDay(${i}, this)">${day.label}</div>
-        `).join('');
-        showPlanDay(0);
-    }
-
-    function showPlanDay(idx, el) {
-        if(el) {
-            document.querySelectorAll('.f-plan-tab').forEach(t => t.classList.remove('active'));
-            el.classList.add('active');
-        }
-        const m = DB[idx];
-        document.getElementById('f-plan-day-title').innerText = `${m.label} 食谱计划`;
-        document.getElementById('f-plan-content').innerHTML = `
-            <div style="background:rgba(0,0,0,0.02); padding:12px; border-radius:12px;">
-                <span style="font-size:10px; font-weight:800; color:var(--ios-blue);">早</span>
-                <div style="font-weight:700; margin-top:4px;">${m.m.n}</div>
-                <div style="font-size:12px; color:var(--text-sub); margin-top:2px;">搭配：${m.m.d}</div>
-            </div>
-            <div style="background:rgba(0,0,0,0.02); padding:12px; border-radius:12px;">
-                <span style="font-size:10px; font-weight:800; color:var(--ios-blue);">午</span>
-                <div style="font-weight:700; margin-top:4px;">${m.l.n}</div>
-                <div style="font-size:12px; color:var(--text-sub); margin-top:2px;">搭配：${m.l.d}</div>
-            </div>
-            <div style="background:rgba(0,0,0,0.02); padding:12px; border-radius:12px;">
-                <span style="font-size:10px; font-weight:800; color:var(--ios-blue);">晚</span>
-                <div style="font-weight:700; margin-top:4px;">${m.n.n}</div>
-                <div style="font-size:12px; color:var(--text-sub); margin-top:2px;">搭配：${m.n.d}</div>
-            </div>
-        `;
-    }
-
-    // --- 导航切换 ---
-    function switchNav(p, el) {
-        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-        el.classList.add('active');
-        document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
-        document.getElementById('page-'+p).classList.add('active');
-        if(p === 'life') f_init();
-    }
-
-    // --- 全屏弹出层逻辑 ---
     function openSub(type) {
-        const layer = document.getElementById('sub-layer');
-        const title = document.getElementById('sub-title');
-        const body = document.getElementById('sub-body');
-        layer.classList.add('active');
-        if(type === 'vision') {
-            title.innerText = '愿景目标';
-            body.innerHTML = `
-                <div style="margin-top:20px;">
-                    <div style="background:#F2F2F7; padding:20px; border-radius:22px; margin-bottom:15px;">
-                        <h3 style="margin:0 0 10px 0; font-size:18px;">🎯 年度核心目标</h3>
-                        <p style="margin:0; font-size:14px; color:#3A3A3C; line-height:1.6;">1. 媒体频道粉丝突破 100k<br>2. 创作 2 张高品质原创专辑<br>3. 完成全年度 24 场直播分享</p>
-                    </div>
-                </div>
-            `;
-        } else {
-            title.innerText = '健康管理';
-            body.innerHTML = `
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:20px;">
-                    <div style="background:#F2F2F7; padding:20px; border-radius:22px; text-align:center;">
-                        <div style="font-size:11px; font-weight:800; color:var(--text-sub); margin-bottom:5px;">当前体重</div>
-                        <div style="font-size:20px; font-weight:800;">72.4 kg</div>
-                    </div>
-                </div>
-            `;
+        const t = document.getElementById('sub-layer-' + (type === 'health' ? 'health' : (type === '2026' ? '2026' : 'vision-future')));
+        if(t) {
+            t.classList.add('active');
+            if(type === 'health') renderHealth();
+            else renderMemoList(type === '2026' ? '2026' : 'future');
         }
-        lucide.createIcons();
     }
-    function closeSub() { document.getElementById('sub-layer').classList.remove('active'); }
 
-    window.onload = function() {
+    function closeAllSubs() { document.querySelectorAll('.sub-layer').forEach(l => l.classList.remove('active')); }
+
+    function openHistory(type) {
+        const fullHistory = type === 'v' ? mediaHistory : musicHistory;
+        const history = fullHistory.filter(h => h.periodType === activePeriod);
+        const list = document.getElementById('history-list');
+        if(history.length === 0) list.innerHTML = `<div style="text-align:center; padding:40px; color:#999;">暂无存档</div>`;
+        else list.innerHTML = history.map(h => `<div class="history-item"><span>${h.label}</span><span>${h.value}</span></div>`).join('');
+        document.getElementById('history-overlay').classList.add('active');
         lucide.createIcons();
-        renderWork();
     }
+
+    function closeHistory() { document.getElementById('history-overlay').classList.remove('active'); }
+
+    // --- 备忘与健康逻辑 ---
+    function renderMemoList(type) {
+        const list = type === '2026' ? saved2026 : savedFuture;
+        const listId = type === '2026' ? 'memo-list-2026' : 'memo-list-future';
+        const container = document.getElementById(listId);
+        if(container) container.innerHTML = list.map((item, i) => `<div class="memo-item"><div class="memo-item-text">${item}</div><div class="memo-del-btn" onclick="deleteItem('${type}', ${i})"><i data-lucide="trash-2" width="18"></i></div></div>`).join('');
+        lucide.createIcons();
+    }
+
+    function addItem(type) {
+        const input = document.getElementById(type === '2026' ? 'memo-input-2026' : 'memo-input-future');
+        if(!input || !input.value.trim()) return;
+        if(type === '2026') { saved2026.unshift(input.value); localStorage.setItem('pure_light_memo_v2', JSON.stringify(saved2026)); }
+        else { savedFuture.unshift(input.value); localStorage.setItem('pure_light_future_vision', JSON.stringify(savedFuture)); }
+        input.value = ''; renderMemoList(type);
+    }
+
+    function deleteItem(type, idx) {
+        if(type === '2026') { saved2026.splice(idx, 1); localStorage.setItem('pure_light_memo_v2', JSON.stringify(saved2026)); }
+        else { savedFuture.splice(idx, 1); localStorage.setItem('pure_light_future_vision', JSON.stringify(savedFuture)); }
+        renderMemoList(type);
+    }
+
+    function renderHealth() {
+        const checkDays = ["一", "二", "三", "四", "五", "六", "日"];
+        const container = document.getElementById('fitness-check');
+        if(container) container.innerHTML = checkDays.map((d, i) => `<div class="check-day ${savedFitness[i] ? 'active' : ''}" onclick="toggleFitness(${i})">${d}</div>`).join('');
+        const todayIdx = (new Date().getDay() === 0) ? 6 : new Date().getDay() - 1;
+        const btnFit = document.getElementById('btn-fitness-main');
+        if(savedFitness[todayIdx]) { btnFit.classList.add('checked-warm'); document.getElementById('txt-fitness-btn').innerText = "健身已打卡"; }
+        else { btnFit.classList.remove('checked-warm'); document.getElementById('txt-fitness-btn').innerText = "健身打卡"; }
+        if(document.getElementById('exam-date-display')) document.getElementById('exam-date-display').innerText = savedExam;
+        lucide.createIcons();
+    }
+
+    function toggleFitness(idx) { savedFitness[idx] = savedFitness[idx] ? 0 : 1; localStorage.setItem('pure_light_fitness', JSON.stringify(savedFitness)); renderHealth(); }
+    function autoCheckToday() { const idx = (new Date().getDay() === 0) ? 6 : new Date().getDay() - 1; savedFitness[idx] = 1; localStorage.setItem('pure_light_fitness', JSON.stringify(savedFitness)); renderHealth(); }
+    function autoUpdateExam(e) { if(e) e.stopPropagation(); const now = new Date(); savedExam = `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, '0')}.${String(now.getDate()).padStart(2, '0')}`; localStorage.setItem('pure_light_exam_date', savedExam); renderHealth(); }
+
+    function checkWeekRotation() {
+        const now = new Date(); const oneJan = new Date(now.getFullYear(), 0, 1);
+        const numberOfDays = Math.floor((now - oneJan) / 86400000);
+        const currentWeekNum = Math.ceil((now.getDay() + 1 + numberOfDays) / 7);
+        if (currentWeekNum != lastWeekNum) {
+            savedFitness = [0,0,0,0,0,0,0]; localStorage.setItem('pure_light_fitness', JSON.stringify(savedFitness)); localStorage.setItem('my_universe_last_week', currentWeekNum);
+        }
+    }
+
+    // --- 生活食谱数据库 ---
+    const DB = [
+        { d: 1, label: "DAY 1", m: { n: "牛腱燕麦面", c: "燕麦面40g", i: ["卤牛腱80g", "鸡蛋1个", "菠菜120g", "香菇80g"], d: "美式", s: ["维生素包", "鱼油"] }, l: { n: "黑椒牛里脊意面", c: "全麦意面70g", i: ["牛里脊180g", "西兰花150g", "彩椒100g", "洋葱50g"], d: "温水", s: ["黑巧", "护肝片"] }, n: { n: "牛里脊(无碳)", c: "无", i: ["牛里脊120g", "西兰花120g", "彩椒80g"], d: "温水" } },
+        { d: 2, label: "DAY 2", m: { n: "奶酪煎蛋吐司", c: "全麦吐司40g", i: ["煎蛋2个", "低脂奶酪30g", "番茄120g", "生菜80g"], d: "奶茶咖啡", s: ["维生素包"] }, l: { n: "蒜香虾仁荞麦面", c: "荞麦面70g", i: ["虾仁200g", "西葫芦120g", "蘑菇150g", "洋葱50g"], d: "温水", s: ["牡蛎", "叶黄素"] }, n: { n: "蒜香虾仁(无碳)", c: "无", i: ["虾仁130g", "西葫芦100g", "蘑菇120g"], d: "温水" } },
+        { d: 3, label: "DAY 3", m: { n: "希腊酸奶燕麦碗", c: "燕麦40g", i: ["希腊酸奶150g", "蓝莓60g", "坚果碎15g", "菠菜80g"], d: "美式", s: ["维生素包", "鱼油"] }, l: { n: "照烧鸡腿糙米饭", c: "糙米饭100g", i: ["去皮鸡腿180g", "胡萝卜100g", "西兰花150g", "洋葱50g"], d: "温水", s: ["黑巧", "护肝片"] }, n: { n: "照烧鸡腿(无碳)", c: "无", i: ["去皮鸡腿120g", "胡萝卜80g", "西兰花120g"], d: "温水" } },
+        { d: 4, label: "DAY 4", m: { n: "红薯豆腐鸡蛋餐", c: "红薯100g", i: ["鸡蛋2个", "嫩豆腐100g", "青菜150g", "木耳60g"], d: "温水", s: ["维生素包"] }, l: { n: "咖喱牛腩米饭", c: "米饭100g", i: ["牛腩200g", "土豆80g", "西兰花150g", "洋葱60g"], d: "温水", s: ["牡蛎", "叶黄素"] }, n: { n: "咖喱牛腩(无碳)", c: "无", i: ["牛腩130g", "西兰花120g", "洋葱50g"], d: "温水" } },
+        { d: 5, label: "DAY 5", m: { n: "三文鱼蛋吐司", c: "吐司40g", i: ["煎鸡蛋1个", "三文鱼80g", "生菜100g", "番茄120g"], d: "温水", s: ["维生素包", "鱼油"] }, l: { n: "蒜香鸡腿玉米粒", c: "玉米粒80g", i: ["去皮鸡腿200g", "芦笋150g", "蘑菇120g", "洋葱50g"], d: "温水", s: ["黑巧", "护肝片"] }, n: { n: "蒜香鸡腿(无碳)", c: "无", i: ["去皮鸡腿130g", "芦笋120g", "蘑菇100g"], d: "温水" } },
+        { d: 6, label: "DAY 6", m: { n: "鸡胸燕麦能量碗", c: "燕麦40g", i: ["鸡胸120g", "香蕉80g", "奇亚籽10g", "菠菜60g"], d: "温水", s: ["维生素包"] }, l: { n: "番茄鳕鱼藜麦饭", c: "藜麦70g", i: ["鳕鱼220g", "卷心菜150g", "胡萝卜100g", "洋葱60g"], d: "温水", s: ["牡蛎", "叶黄素"] }, n: { n: "番茄鳕鱼(无碳)", c: "无", i: ["鳕鱼140g", "卷心菜120g", "洋葱50g"], d: "温水" } },
+        { d: 7, label: "DAY 7", m: { n: "玉米鸡胸鸡蛋餐", c: "玉米100g", i: ["鸡蛋2个", "鸡胸100g", "菠菜120g", "香菇80g"], d: "美式", s: ["维生素包", "鱼油"] }, l: { n: "孜然牛肉红薯餐", c: "红薯120g", i: ["牛肉200g", "青椒120g", "洋葱60g", "西葫芦120g"], d: "温水", s: ["黑巧", "护肝片"] }, n: { n: "孜然牛肉(无碳)", c: "无", i: ["牛肉130g", "青椒100g", "西葫芦100g"], d: "温水" } },
+        { d: 8, label: "DAY 8", m: { n: "火腿蛋吐司", c: "吐司40g", i: ["煎蛋2个", "火腿80g", "番茄120g", "生菜80g"], d: "温水", s: ["维生素包"] }, l: { n: "蒜香鳕鱼意面", c: "全麦意面70g", i: ["鳕鱼200g", "西兰花150g", "彩椒100g", "洋葱50g"], d: "温水", s: ["牡蛎", "叶黄素"] }, n: { n: "蒜香鳕鱼(无碳)", c: "无", i: ["鳕鱼130g", "西兰花120g", "彩椒80g"], d: "温水" } },
+        { d: 9, label: "DAY 9", m: { n: "豆腐鸡蛋燕麦面", c: "燕麦40g", i: ["鸡蛋1个", "嫩豆腐120g", "菠菜150g", "香菇80g"], d: "美式", s: ["维生素包", "鱼油"] }, l: { n: "黑椒虾仁荞麦面", c: "荞麦面70g", i: ["虾仁220g", "蘑菇150g", "西葫芦120g", "洋葱50g"], d: "温水", s: ["黑巧", "护肝片"] }, n: { n: "黑椒虾仁(无碳)", c: "无", i: ["虾仁140g", "蘑菇120g", "西葫芦100g"], d: "温水" } },
+        { d: 10, label: "DAY 10", m: { n: "草莓燕麦能量碗", c: "燕麦40g", i: ["酸奶150g", "草莓80g", "坚果碎15g", "菠菜80g"], d: "美式", s: ["维生素包"] }, l: { n: "照烧三文鱼糙米饭", c: "糙米饭100g", i: ["三文鱼180g", "西兰花150g", "胡萝卜100g", "洋葱50g"], d: "温水", s: ["牡蛎", "叶黄素"] }, n: { n: "照烧三文鱼(无碳)", c: "无", i: ["三文鱼120g", "西兰花120g", "胡萝卜80g"], d: "温水" } },
+        { d: 11, label: "DAY 11", m: { n: "牛油果蛋吐司", c: "吐司40g", i: ["煎蛋2个", "牛油果40g", "番茄120g", "生菜80g"], d: "温水", s: ["维生素包", "鱼油"] }, l: { n: "番茄炖牛腱米饭", c: "米饭100g", i: ["牛腱200g", "卷心菜150g", "土豆80g", "洋葱60g"], d: "温水", s: ["黑巧", "护肝片"] }, n: { n: "番茄炖牛腱(无碳)", c: "无", i: ["牛腱130g", "卷心菜120g", "洋葱50g"], d: "温水" } },
+        { d: 12, label: "DAY 12", m: { n: "红薯鸡胸鸡蛋餐", c: "红薯100g", i: ["鸡蛋2个", "鸡胸100g", "青菜150g", "木耳60g"], d: "温水", s: ["维生素包"] }, l: { n: "蒜香虾仁玉米粒", c: "玉米粒80g", i: ["虾仁220g", "芦笋150g", "蘑菇120g", "洋葱50g"], d: "温水", s: ["牡蛎", "叶黄素"] }, n: { n: "蒜香虾仁(无碳)", c: "无", i: ["虾仁140g", "芦笋120g", "蘑菇100g"], d: "温水" } },
+        { d: 13, label: "DAY 13", m: { n: "鸡胸燕麦奇亚籽", c: "燕麦40g", i: ["鸡胸120g", "香蕉80g", "奇亚籽10g", "菠菜60g"], d: "温水", s: ["维生素包", "鱼油"] }, l: { n: "清炖牛腩藜麦饭", c: "藜麦70g", i: ["牛腩220g", "白萝卜150g", "胡萝卜100g", "洋葱60g"], d: "温水", s: ["黑巧", "护肝片"] }, n: { n: "清炖牛腩(无碳)", c: "无", i: ["牛腩140g", "白萝卜120g", "洋葱50g"], d: "温水" } },
+        { d: 14, label: "DAY 14", m: { n: "奶酪煎蛋吐司", c: "吐司40g", i: ["煎蛋1个", "低脂奶酪30g", "番茄120g", "生菜80g"], d: "美式", s: ["维生素包"] }, l: { n: "孜然鸡腿红薯餐", c: "红薯120g", i: ["去皮鸡腿200g", "青椒120g", "洋葱60g", "西葫芦120g"], d: "温水", s: ["牡蛎", "叶黄素"] }, n: { n: "孜然鸡腿(无碳)", c: "无", i: ["去皮鸡腿130g", "青椒100g", "西葫芦100g"], d: "温水" } }
+    ];
+
+    let f_state = { todayIdx: 0, planIdx: 0, viewingPlan: [] };
+
+    function f_init() {
+        const d = new Date(); const diff = Math.floor((d - new Date(2025,0,6)) / 86400000);
+        f_state.todayIdx = (diff % 14 + 14) % 14;
+        f_state.viewingPlan = [JSON.parse(JSON.stringify(DB[(f_state.todayIdx+1)%14])), JSON.parse(JSON.stringify(DB[(f_state.todayIdx+2)%14])), JSON.parse(JSON.stringify(DB[(f_state.todayIdx+3)%14]))];
+        f_render_today();
+    }
+
+    function f_render_today() {
+        const meal = DB[f_state.todayIdx];
+        const badge = document.getElementById('f-cycle-text');
+        if (badge) badge.innerText = `食谱推荐 ${f_state.todayIdx + 1} / 14`;
+        const setRow = (p, data) => {
+            const nameEl = document.getElementById(`f-${p}-name`);
+            const descEl = document.getElementById(`f-${p}-desc`);
+            const drinkEl = document.getElementById(`f-${p}-drink`);
+            const suppsEl = document.getElementById(`f-${p}-supps`);
+            if (nameEl) nameEl.innerText = data.n;
+            if (descEl) descEl.innerText = `${data.c} · ${data.i.join(' · ')}`;
+            if (drinkEl) drinkEl.innerText = data.d;
+            if (p !== 'n' && data.s && suppsEl) suppsEl.innerText = data.s.join(' + ');
+        };
+        setRow('m', meal.m); setRow('l', meal.l); setRow('n', meal.n);
+    }
+
+    function f_swap() { f_state.todayIdx = (f_state.todayIdx + 1) % 14; f_render_today(); }
+
+    function f_render_plan() {
+        const weekDaysCN = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
+        const tabsEl = document.getElementById('f-plan-tabs');
+        if (tabsEl) {
+            tabsEl.innerHTML = f_state.viewingPlan.map((d, i) => {
+                const date = new Date(); date.setDate(date.getDate() + i + 1);
+                return `<div class="f-plan-tab ${i === f_state.planIdx ? 'active' : ''}" onclick="f_select_plan(${i})">${weekDaysCN[date.getDay()]}</div>`;
+            }).join('');
+        }
+        const m = f_state.viewingPlan[f_state.planIdx];
+        const titleEl = document.getElementById('f-plan-day-title');
+        const contentEl = document.getElementById('f-plan-content');
+        if (titleEl) titleEl.innerText = `食谱推荐 ${m.d}`;
+        if (contentEl) {
+            contentEl.innerHTML = `<div style="background:rgba(0,0,0,0.02); padding:16px; border-radius:12px;"><span style="font-size:10px; font-weight:800; color:var(--ios-blue);">早餐 / ${m.m.d}</span><div style="font-weight:700; margin-top:4px;">${m.m.n}</div><div style="font-size:12px; color:var(--ios-gray); margin-top:2px;">${m.m.c} · ${m.m.i.join(' · ')}</div></div><div style="background:rgba(0,0,0,0.02); padding:16px; border-radius:12px;"><span style="font-size:10px; font-weight:800; color:var(--ios-blue);">午餐 / ${m.l.d}</span><div style="font-weight:700; margin-top:4px;">${m.l.n}</div><div style="font-size:12px; color:var(--ios-gray); margin-top:2px;">${m.l.c} · ${m.l.i.join(' · ')}</div></div>`;
+        }
+        const all = [...m.m.i, ...m.l.i, ...m.n.i, m.m.c, m.l.c];
+        const seafoodEl = document.getElementById('f-list-seafood');
+        const meatEl = document.getElementById('f-list-meat');
+        const vegEl = document.getElementById('f-list-veg');
+        if (seafoodEl) seafoodEl.innerHTML = Array.from(new Set(all.filter(i => /鱼|虾|蟹/.test(i)))).map(i => `<span class="f-ing-tag">${i}</span>`).join('');
+        if (meatEl) meatEl.innerHTML = Array.from(new Set(all.filter(i => /牛|鸡|蛋|腿|里脊|腱|火腿/.test(i) && !/鱼|虾|蟹/.test(i)))).map(i => `<span class="f-ing-tag">${i}</span>`).join('');
+        if (vegEl) vegEl.innerHTML = Array.from(new Set(all.filter(i => !/牛|鸡|蛋|腿|里脊|腱|火腿|鱼|虾|蟹/.test(i) && i !== '无'))).map(i => `<span class="f-ing-tag">${i}</span>`).join('');
+        lucide.createIcons();
+    }
+    function f_select_plan(idx) { f_state.planIdx = idx; f_render_plan(); }
+    function f_step_next() { f_state.viewingPlan[f_state.planIdx] = JSON.parse(JSON.stringify(DB[f_state.viewingPlan[f_state.planIdx].d % 14])); f_render_plan(); }
+    function f_sync() { f_state.todayIdx = f_state.viewingPlan[f_state.planIdx].d - 1; switchLife('today', document.getElementById('btn-f-today')); f_render_today(); }
+
+    window.onload = function() { lucide.createIcons(); renderWork(); checkWeekRotation(); }
 </script>
 </body>
 </html>
