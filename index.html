@@ -5,19 +5,64 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <!-- 强制设置添加到主屏幕的标题为 Xl -->
     <meta name="apple-mobile-web-app-title" content="Xl">
     
-    <!-- 1. 网页标题 -->
     <title>Xl</title>
 
-    <!-- 2. 纯星空图标 (Base64编码增强版) -->
-    <!-- 使用 Base64 编码可以解决 iOS 有时无法识别 SVG 代码导致显示 "X" 的问题 -->
-    <!-- 图标内容：深邃蓝黑渐变背景 + 散落的白色微光星星，无球体 -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImEiIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPjxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiMwMDIwM2YiLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwMDAwMDAiLz48L2xpbmVhckdyYWRpZW50PjwvZGVmcz48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgZmlsbD0idXJsKCNhKSIvPjxjaXJjbGUgY3g9IjEwMCIgY3k9IjEwMCIgcj0iNSIgZmlsbD0iI2ZmZiIgb3BhY2l0eT0iMC45Ii8+PGNpcmNsZSBjeD0iNDAwIiBjeT0iNTAiIHI9IjMiIGZpbGw9IiNmZmYiIG9wYWNpdHk9IjAuNyIvPjxjaXJjbGUgY3g9IjIwMCIgY3k9IjQwMCIgcj0iNCIgZmlsbD0iI2ZmZiIgb3BhY2l0eT0iMC44Ii8+PGNpcmNsZSBjeD0iNDUwIiBjeT0iMzAwIiByPSIyIiBmaWxsPSIjZmZmIiBvcGFjaXR5PSIwLjYiLz48Y2lyY2xlIGN4PSI1MCIgY3k9IjI1MCIgcj0iMyIgZmlsbD0iI2ZmZiIgb3BhY2l0eT0iMC44Ii8+PGNpcmNsZSBjeD0iMzUwIiBjeT0iMTUwIiByPSI0IiBmaWxsPSIjZmZmIiBvcGFjaXR5PSIwLjUiLz48Y2lyY2xlIGN4PSIzMDAiIGN5PSI0NTAiIHI9IjIiIGZpbGw9IiNmZmYiIG9wYWNpdHk9IjAuNyIvPjwvc3ZnPg==">
-    
-    <!-- 专门针对 iOS 的 apple-touch-icon 设置 -->
-    <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImEiIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPjxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiMwMDIwM2YiLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwMDAwMDAiLz48L2xpbmVhckdyYWRpZW50PjwvZGVmcz48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgZmlsbD0idXJsKCNhKSIvPjxjaXJjbGUgY3g9IjEwMCIgY3k9IjEwMCIgcj0iNSIgZmlsbD0iI2ZmZiIgb3BhY2l0eT0iMC45Ii8+PGNpcmNsZSBjeD0iNDAwIiBjeT0iNTAiIHI9IjMiIGZpbGw9IiNmZmYiIG9wYWNpdHk9IjAuNyIvPjxjaXJjbGUgY3g9IjIwMCIgY3k9IjQwMCIgcj0iNCIgZmlsbD0iI2ZmZiIgb3BhY2l0eT0iMC44Ii8+PGNpcmNsZSBjeD0iNDUwIiBjeT0iMzAwIiByPSIyIiBmaWxsPSIjZmZmIiBvcGFjaXR5PSIwLjYiLz48Y2lyY2xlIGN4PSI1MCIgY3k9IjI1MCIgcj0iMyIgZmlsbD0iI2ZmZiIgb3BhY2l0eT0iMC44Ii8+PGNpcmNsZSBjeD0iMzUwIiBjeT0iMTUwIiByPSI0IiBmaWxsPSIjZmZmIiBvcGFjaXR5PSIwLjUiLz48Y2lyY2xlIGN4PSIzMDAiIGN5PSI0NTAiIHI9IjIiIGZpbGw9IiNmZmYiIG9wYWNpdHk9IjAuNyIvPjwvc3ZnPg==">
+    <!-- === 核心修复：自动生成 iOS 专用 PNG 图标脚本 === -->
+    <script>
+        (function() {
+            // 1. 创建一个画布
+            var canvas = document.createElement('canvas');
+            canvas.width = 180;  // iOS 图标标准尺寸
+            canvas.height = 180;
+            var ctx = canvas.getContext('2d');
+
+            // 2. 绘制深邃星空背景 (深蓝到黑色的渐变)
+            var gradient = ctx.createLinearGradient(0, 0, 0, 180);
+            gradient.addColorStop(0, "#0f2027"); 
+            gradient.addColorStop(0.5, "#203a43");
+            gradient.addColorStop(1, "#2c5364");
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, 180, 180);
+
+            // 3. 绘制散落的星星 (纯净星空，无球体)
+            function drawStar(x, y, r, opacity) {
+                ctx.beginPath();
+                ctx.arc(x, y, r, 0, 2 * Math.PI);
+                ctx.fillStyle = 'rgba(255, 255, 255, ' + opacity + ')';
+                ctx.fill();
+            }
+
+            // 随机撒点星星
+            var stars = [
+                [30, 40, 1.5, 0.9], [150, 20, 2, 0.8], [80, 80, 1, 0.6],
+                [120, 140, 2.5, 0.9], [40, 160, 1.5, 0.7], [160, 100, 1, 0.5],
+                [90, 30, 1.5, 0.8], [20, 100, 2, 0.6], [100, 100, 1, 0.4],
+                [60, 10, 2, 0.9], [170, 170, 1.5, 0.8], [10, 10, 1, 0.5],
+                [130, 60, 1.8, 0.8], [50, 120, 1.2, 0.7], [110, 10, 1.5, 0.6]
+            ];
+
+            stars.forEach(function(s) {
+                drawStar(s[0], s[1], s[2], s[3]);
+            });
+
+            // 4. 生成 PNG 数据 (iOS 只认这个)
+            var iconUrl = canvas.toDataURL('image/png');
+
+            // 5. 动态插入标签
+            var linkIcon = document.createElement('link');
+            linkIcon.rel = 'icon';
+            linkIcon.href = iconUrl;
+            document.head.appendChild(linkIcon);
+
+            var linkApple = document.createElement('link');
+            linkApple.rel = 'apple-touch-icon';
+            linkApple.href = iconUrl;
+            document.head.appendChild(linkApple);
+        })();
+    </script>
+    <!-- ============================================== -->
 
     <!-- 引入图标库 -->
     <script src="https://unpkg.com/lucide@latest"></script>
