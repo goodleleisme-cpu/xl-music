@@ -34,9 +34,10 @@
             font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
             background-color: var(--bg-light); color: var(--text-main);
             height: 100vh; overflow: hidden;
-            /* 全局背景：纽约中央公园暮色 - 复刻参考图的蓝金渐变与城市灯火 */
-            background-image: url('https://images.unsplash.com/photo-1518235506717-e1ed3306a89b?q=80&w=2000&auto=format&fit=crop');
+            /* 全局背景：经典的碧海蓝天金沙滩 - 极简、通透、阳光感最强 */
+            background-image: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=2000&auto=format&fit=crop');
             background-size: cover; background-position: center;
+            background-repeat: no-repeat;
         }
 
         #app-frame {
@@ -513,6 +514,7 @@
 
 <script>
     // --- 数据存储系统 ---
+    // 使用 localStorage 确保数据在页面关闭或刷新后依然存在（模拟 APP 本地存储）
     let counters = JSON.parse(localStorage.getItem('my_universe_counters_v3')) || {
         week: { v: 0, m: 0 },
         month: { v: 0, m: 0 },
@@ -523,11 +525,18 @@
     let mediaHistory = JSON.parse(localStorage.getItem('my_universe_media_history_v2')) || [];
     let musicHistory = JSON.parse(localStorage.getItem('my_universe_music_history_v2')) || [];
     
-    let saved2026 = JSON.parse(localStorage.getItem('pure_light_memo_v2')) || ["保持对世界的好奇心"];
-    let savedFuture = JSON.parse(localStorage.getItem('pure_light_future_vision')) || ["实现财务与时间的自由"];
+    // 愿景和目标初始化逻辑修改：默认为空数组 []，只有您自己添加的内容才会显示。
+    let saved2026 = JSON.parse(localStorage.getItem('pure_light_memo_v2')) || [];
+    let savedFuture = JSON.parse(localStorage.getItem('pure_light_future_vision')) || [];
+    
     let savedFitness = JSON.parse(localStorage.getItem('pure_light_fitness')) || [0,0,0,0,0,0,0];
-    let savedExam = localStorage.getItem('pure_light_exam_date') || "2025.12.01";
-    let lastWeekNum = localStorage.getItem('my_universe_last_week') || 0;
+    
+    // 体检日期初始化逻辑修改：默认为“未记录”，等待您更新。
+    let savedExam = localStorage.getItem('pure_light_exam_date') || "未记录";
+    
+    // 升级：不再存储周数，而是存储“最后一次重置的那周周一的日期字符串”
+    // 这样能确保每周一（或新的一周开始时）绝对精准地重置
+    let lastWeekMonday = localStorage.getItem('my_universe_last_week_monday') || "";
 
     let activePeriod = 'week';
 
@@ -548,7 +557,7 @@
         if(activePeriod === 'month') label = `${now.getFullYear()}年${now.getMonth()+1}月结算`;
         else if(activePeriod === 'quarter') label = `${now.getFullYear()}年Q${Math.floor(now.getMonth()/3)+1}结算`;
         else if(activePeriod === 'year') label = `${now.getFullYear()}年度总结`;
-        else label = `第${lastWeekNum}周存档`;
+        else label = `第${getWeekNumber(now)}周存档`; // 存档时简单显示一下周数
 
         const log = { label, value: valToSubmit, periodType: activePeriod, date: now.getTime() };
         if(type === 'v') mediaHistory.unshift(log);
@@ -556,6 +565,15 @@
         localStorage.setItem(`my_universe_${type==='v'?'media':'music'}_history_v2`, JSON.stringify(type==='v'?mediaHistory:musicHistory));
         counters[activePeriod][type] = 0;
         saveCounters(); renderWork();
+    }
+    
+    // 辅助函数：获取当前周数（用于存档显示，不用于重置逻辑）
+    function getWeekNumber(d) {
+        d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+        d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay()||7));
+        var yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
+        var weekNo = Math.ceil(( ( (d - yearStart) / 86400000) + 1)/7);
+        return weekNo;
     }
 
     function saveCounters() { localStorage.setItem('my_universe_counters_v3', JSON.stringify(counters)); }
@@ -664,12 +682,33 @@
     function autoCheckToday() { const idx = (new Date().getDay() === 0) ? 6 : new Date().getDay() - 1; savedFitness[idx] = 1; localStorage.setItem('pure_light_fitness', JSON.stringify(savedFitness)); renderHealth(); }
     function autoUpdateExam(e) { if(e) e.stopPropagation(); const now = new Date(); savedExam = `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, '0')}.${String(now.getDate()).padStart(2, '0')}`; localStorage.setItem('pure_light_exam_date', savedExam); renderHealth(); }
 
+    // --- 核心更新：更精准的“周”重置逻辑 ---
+    // 计算当前日期的“所在周周一”的日期字符串 (格式: "Mon Feb 02 2026")
+    function getCurrentWeekIdentifier() {
+        const d = new Date();
+        const day = d.getDay();
+        // 计算与周一的差距：如果今天是周日(0)，则距离周一有6天；如果是周一(1)，距离0天。
+        // 这里假设一周的开始是周一，结束是周日
+        const diff = d.getDate() - day + (day === 0 ? -6 : 1); 
+        const monday = new Date(d.setDate(diff));
+        return monday.toDateString(); 
+    }
+
     function checkWeekRotation() {
-        const now = new Date(); const oneJan = new Date(now.getFullYear(), 0, 1);
-        const numberOfDays = Math.floor((now - oneJan) / 86400000);
-        const currentWeekNum = Math.ceil((now.getDay() + 1 + numberOfDays) / 7);
-        if (currentWeekNum != lastWeekNum) {
-            savedFitness = [0,0,0,0,0,0,0]; localStorage.setItem('pure_light_fitness', JSON.stringify(savedFitness)); localStorage.setItem('my_universe_last_week', currentWeekNum);
+        const currentWeekMonday = getCurrentWeekIdentifier();
+        
+        // 如果存储的“上周一”和“这周一”不一样，说明跨周了
+        if (currentWeekMonday !== lastWeekMonday) {
+            // 重置健身数据
+            savedFitness = [0,0,0,0,0,0,0]; 
+            localStorage.setItem('pure_light_fitness', JSON.stringify(savedFitness));
+            
+            // 更新存储的周一标记
+            localStorage.setItem('my_universe_last_week_monday', currentWeekMonday);
+            lastWeekMonday = currentWeekMonday;
+            
+            // 可选：如果是新的一周，工作计数的“周”统计也可以考虑重置，但这里只针对健身部分
+            // 如果希望工作周也同时重置，可以在这里把 counters.week.v = 0; 等加上
         }
     }
 
